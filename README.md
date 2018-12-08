@@ -17,10 +17,10 @@
 
 ### Sample Codes ###
 ------------------------------------------------------------------------------------------------------------------
--- These codes will add the following items to the player's inventory:
--- artifact: A one-charge code from a questgiver or GM.
--- ballroom: A multi-charge code giving three items for a tuxedo outfit.
--- sixbags: A limited multi-charge code giving 6 Netherweave bags to the player.
+- These codes will add the following items to the player's inventory:
+    - **artifact**: A one-charge code from a questgiver or GM.
+    - **ballroom**: A multi-charge code giving three items for a tuxedo outfit.
+    - **sixbags**: A limited multi-charge code giving 6 Netherweave bags to the player.
 
 
 ### To-Do ###
