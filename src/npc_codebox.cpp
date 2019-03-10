@@ -961,7 +961,7 @@ public:
     // CREATURE AI
     CreatureAI * GetAI(Creature * creature) const
     {
-        return new codebox_passivesAI(creature);
+        return new NPC_PassiveAI(creature);
     }
 };
 
