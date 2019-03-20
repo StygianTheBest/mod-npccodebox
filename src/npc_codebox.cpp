@@ -74,6 +74,7 @@ This code and content is released under the [GNU AGPL v3](https://github.com/aze
 */
 
 #include "Config.h"
+#include "ScriptedGossip.h"
 
 enum Customization {
     CUSTOMIZE_FACTION = 1,
@@ -205,7 +206,7 @@ public:
 
         if (action == 20)
         {
-            if (!code || code == " ")
+            if (!code || strcmp(code, " ") != -1)
             {
                 code = "";
                 std::ostringstream messageCode;
@@ -279,7 +280,7 @@ public:
             }
             else {
                 snprintf(DelLoot[guid].loot, sizeof(DelLoot[guid].loot), "%s", code);
-                ClearGossipMenuFor(player);
+                player->PlayerTalkClass->ClearMenus();
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Delete Loot Code", GOSSIP_SENDER_MAIN, 41);
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Cancel", GOSSIP_SENDER_MAIN, 42);
 
@@ -288,7 +289,7 @@ public:
         }
 
         if (action == 60) {
-            if (!code || code == " ")
+            if (!code || strcmp(code, " ") != -1)
             {
                 code = "";
                 std::ostringstream messageCode;
@@ -352,7 +353,7 @@ public:
 
         if (action == 25)
         {
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
 
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Customize Character Faction", GOSSIP_SENDER_MAIN, 250);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Customize Character Race", GOSSIP_SENDER_MAIN, 251);
@@ -431,7 +432,7 @@ public:
         if (action == 50)
         {
             // Delete the entry from the database
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
             lootid[guid] = 0;
 
             QueryResult getLoot = WorldDatabase.PQuery("SELECT * FROM lootcode_items LIMIT %u;", max_loot_results);
@@ -482,7 +483,7 @@ public:
         if (action == 65)
         {
             // Show Customize Options
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
 
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Customize Character Faction", GOSSIP_SENDER_MAIN, 650);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Customize Character Race", GOSSIP_SENDER_MAIN, 651);
@@ -547,7 +548,7 @@ public:
 
         if (action == 80)
         {
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
             lootid[guid] += max_loot_results;
             QueryResult getLoot = WorldDatabase.PQuery("SELECT * FROM lootcode_items LIMIT %u,%u;", lootid[guid], max_loot_results);
             QueryResult count_results = WorldDatabase.PQuery("SELECT COUNT(id) FROM lootcode_items");
@@ -602,7 +603,7 @@ public:
 
         if (action == 81)
         {
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
             lootid[guid] -= max_loot_results;
             QueryResult getLoot = WorldDatabase.PQuery("SELECT * FROM lootcode_items LIMIT %u,%u;", lootid[guid], max_loot_results);
             QueryResult count_results = WorldDatabase.PQuery("SELECT COUNT(id) FROM lootcode_items");
@@ -662,7 +663,7 @@ public:
 
         if (action >= 100)
         {
-            ClearGossipMenuFor(player);
+            player->PlayerTalkClass->ClearMenus();
 
             editid[guid] = action - 100;
             std::string add_loot_text = "Enter Loot Code";
@@ -713,7 +714,7 @@ public:
 
     void showEditMenu(Player* player, Creature* creature, uint32 id)
     {
-        ClearGossipMenuFor(player);
+        player->PlayerTalkClass->ClearMenus();
 
         uint32 guid = player->GetGUID();
         std::string add_loot_text = "Enter Loot Code";
@@ -751,7 +752,7 @@ public:
     void showLootMenu(Player* player, Creature* creature)
     {
 
-        ClearGossipMenuFor(player);
+        player->PlayerTalkClass->ClearMenus();
 
         uint32 guid = player->GetGUID();
         std::string add_loot_text = "Enter Loot Code";
@@ -789,7 +790,7 @@ public:
 
     void showInitialMenu(Player* player, Creature* creature)
     {
-        ClearGossipMenuFor(player);
+        player->PlayerTalkClass->ClearMenus();
 
         // If GameMaster
         if (player->IsGameMaster())
@@ -885,22 +886,22 @@ public:
                 if (chargesUsed < charges)
                 {
                     // Add the entry to the database
-                    WorldDatabase.PQuery("INSERT INTO lootcode_player (code, playerGUID, playerName, isUnique) VALUES ('%s', %u, '%s', %u);", (code), player->GetGUID(), player->GetName(), isUnique);
+                    WorldDatabase.PQuery("INSERT INTO lootcode_player (code, playerGUID, playerName, isUnique) VALUES ('%s', %u, '%s', %u);", (code), player->GetGUID(), player->GetName().c_str(), isUnique);
 
                     // Add Item to player inventory
-                    if (itemId != NULL)
+                    if (itemId != 0)
                     {
                         player->AddItem(itemId, quantity);
                     }
 
                     // Add Gold to player inventory
-                    if (gold != NULL)
+                    if (gold != 0)
                     {
                         player->ModifyMoney(gold * 10000);
                     }
 
                     // Customize Character
-                    if (customize != NULL)
+                    if (customize != 0)
                     {
                         // Faction
                         if (customize == CUSTOMIZE_FACTION)
